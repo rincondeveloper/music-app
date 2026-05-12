@@ -1,0 +1,9 @@
+0 0 1 8 Let Down 1
+0 0 2 16 Paranoid Android 2
+0 0 3 12 No Surprises 3
+0 0 4 12 Karma Police 4
+1 0 1 10 Is This It 1
+1 0 2 10 Modern Age 2
+1 0 3 9 Last Nite 3
+1 0 4 7 Someday 4
+1 0 5 19 Take It Or Leave It 5
