@@ -40,7 +40,7 @@ struct Artista {
     int    totalAlbumes;
 };
 
-// ─── ARREGLO GLOBAL ──────────────────────────────────────────────────────────
+// ─── Creación de un arreglo (10 max), tipo: struct Artista
 const int MAX_ARTISTAS = 10;
 Artista artistas[MAX_ARTISTAS];
 int totalArtistas = 0;
@@ -86,12 +86,16 @@ NodoCola* finalCola  = nullptr;
 
 void enqueueCola(Cancion c, string artista, string album) {
     NodoCola* nuevo = new NodoCola();
-    nuevo->cancion       = c;
+    nuevo->cancion = c;
     nuevo->nombreArtista = artista;
-    nuevo->nombreAlbum   = album;
-    nuevo->siguiente     = nullptr;
-    if (!finalCola) { frenteCola = finalCola = nuevo; }
-    else { finalCola->siguiente = nuevo; finalCola = nuevo; }
+    nuevo->nombreAlbum = album;
+    nuevo->siguiente = nullptr;
+    if (!finalCola) { 
+        frenteCola = finalCola = nuevo; 
+    } else { 
+        finalCola->siguiente = nuevo; 
+        finalCola = nuevo; 
+    }
 }
 
 bool dequeueCola(Cancion& c, string& artista, string& album) {
@@ -176,6 +180,7 @@ void guardarArtistas() {
 void cargarArtistas() {
     ifstream f("artistas.bin", ios::binary);
     if (!f) return;
+
     ArtistaArchivo a;
     totalArtistas = 0;
     // guarda un struct de artistas en arreglo
@@ -183,6 +188,7 @@ void cargarArtistas() {
         artistas[totalArtistas].id = a.id;
         strncpy(artistas[totalArtistas].nombre, a.nombre, 50);
         artistas[totalArtistas].totalAlbumes = 0;
+
         totalArtistas++;
     }
     f.close();
@@ -206,20 +212,23 @@ void guardarAlbumes() {
 void cargarAlbumes() {
     ifstream f("albumes.csv");
     if (!f) return;
+
     string linea;
     getline(f, linea); // saltar encabezado
     while (getline(f, linea)) {
         int idArtista, idAlbum, anio, totalCanciones;
         char titulo[50], genero[30];
-        sscanf(linea.c_str(), "%d,%d,%49[^,],%29[^,],%d,%d",
-               &idArtista, &idAlbum, titulo, genero, &anio, &totalCanciones);
+        sscanf(linea.c_str(), "%d,%d,%49[^,],%29[^,],%d,%d", &idArtista, &idAlbum, titulo, genero, &anio, &totalCanciones);
+
         if (idArtista < totalArtistas) {
             int j = artistas[idArtista].totalAlbumes;
+
             artistas[idArtista].albumes[j].id = idAlbum;
             strncpy(artistas[idArtista].albumes[j].titulo, titulo, 50);
             strncpy(artistas[idArtista].albumes[j].genero, genero, 30);
             artistas[idArtista].albumes[j].anio = anio;
             artistas[idArtista].albumes[j].totalCanciones = 0;
+
             artistas[idArtista].totalAlbumes++;
         }
     }
@@ -247,6 +256,7 @@ void guardarCanciones() {
 void cargarCanciones() {
     ifstream f("canciones.txt");
     if (!f) return;
+
     int idArtista, idAlbum, id, lenTitulo, pista;
     char titulo[50];
     while (f >> idArtista >> idAlbum >> id >> lenTitulo) {
@@ -254,11 +264,14 @@ void cargarCanciones() {
         f.read(titulo, lenTitulo);
         titulo[lenTitulo] = '\0';
         f >> pista;
+
         if (idArtista < totalArtistas && idAlbum < artistas[idArtista].totalAlbumes) {
             int k = artistas[idArtista].albumes[idAlbum].totalCanciones;
+
             artistas[idArtista].albumes[idAlbum].canciones[k].id = id;
             strncpy(artistas[idArtista].albumes[idAlbum].canciones[k].titulo, titulo, 50);
             artistas[idArtista].albumes[idAlbum].canciones[k].numeroPista = pista;
+
             artistas[idArtista].albumes[idAlbum].totalCanciones++;
         }
     }
@@ -276,7 +289,7 @@ void cargarTodo() {
     cargarArtistas();
     cargarAlbumes();
     cargarCanciones();
-    cout << GREEN << "\n  ✓ Datos cargados correctamente.\n" << RESET;
+    cout << GREEN << "\nDatos cargados correctamente.\n" << RESET;
 }
 
 // ─── REGISTRO ────────────────────────────────────────────────────────────────
@@ -300,11 +313,17 @@ void registrarAlbum() {
         cout << RED << "\n  ⚠ No hay artistas registrados. Registra uno primero.\n" << RESET;
         pausar(); return;
     }
+
     cout << "\n  Selecciona artista:\n";
-    for (int i = 0; i < totalArtistas; i++)
+    for (int i = 0; i < totalArtistas; i++) {
         cout << "  [" << i+1 << "] " << artistas[i].nombre << "\n";
+    }
+
     cout << GRAY << "  >> " << RESET;
-    int sel; cin >> sel; sel--;
+    int sel; 
+    cin >> sel; 
+    sel--;
+
     if (sel < 0 || sel >= totalArtistas) { cout << RED << "\n  Opción inválida.\n" << RESET; pausar(); return; }
     if (artistas[sel].totalAlbumes >= 10) { cout << RED << "\n  Límite de álbumes alcanzado.\n" << RESET; pausar(); return; }
 
@@ -387,28 +406,29 @@ void cargarTodasEnCola() {
     }
     finalCola = nullptr;
 
-    for (int i = 0; i < totalArtistas; i++)
-        for (int j = 0; j < artistas[i].totalAlbumes; j++)
-            for (int k = 0; k < artistas[i].albumes[j].totalCanciones; k++)
-                enqueueCola(artistas[i].albumes[j].canciones[k],
-                            artistas[i].nombre,
-                            artistas[i].albumes[j].titulo);
+    for (int i = 0; i < totalArtistas; i++) {
+        for (int j = 0; j < artistas[i].totalAlbumes; j++) {
+            for (int k = 0; k < artistas[i].albumes[j].totalCanciones; k++) {
+                enqueueCola(artistas[i].albumes[j].canciones[k], artistas[i].nombre, artistas[i].albumes[j].titulo);
+            }
+        }
+    }
 }
 
 void mostrarTodasCanciones() {
     int num = 1;
     bool hay = false;
+
     for (int i = 0; i < totalArtistas; i++) {
         for (int j = 0; j < artistas[i].totalAlbumes; j++) {
             for (int k = 0; k < artistas[i].albumes[j].totalCanciones; k++) {
                 hay = true;
-                bool esActual = hayReproduccion &&
-                    strcmp(cancionActual.titulo,
-                           artistas[i].albumes[j].canciones[k].titulo) == 0;
-                if (esActual)
+                bool esActual = hayReproduccion && strcmp(cancionActual.titulo, artistas[i].albumes[j].canciones[k].titulo) == 0;
+                if (esActual) {
                     cout << GREEN << "  ♪ ";
-                else
+                } else {
                     cout << GRAY  << "  " << num << ". ";
+                }
                 cout << WHITE << artistas[i].albumes[j].canciones[k].titulo
                      << GRAY << " — " << artistas[i].nombre
                      << " — " << artistas[i].albumes[j].titulo
@@ -705,8 +725,8 @@ void pantallaPrincipal() {
         cout << "\n";
         mostrarTodasCanciones();
         cout << "\n"; separador();
-        cout << "  " << "   ⏮\t\t ▶\t    ⏭\n"       << RESET;
-        cout << "  " << "Anterior\tPlay\t Siguiente\n"       << RESET;
+        cout << "  " << "   ⏮\t\t ▶\t    ⏭\n" << RESET;
+        cout << "  " << "Anterior\tPlay\t Siguiente\n" << RESET;
         cout << "  " << CYAN << "  [A]\t\t[P]\t   [S]\n" << RESET;
         cout << DIM  << "  ─────────────────────────────────────────────\n" << RESET;
         cout << "  " << CYAN << "[1]" << RESET << WHITE << "  Registro\n"                   << RESET;
@@ -777,7 +797,7 @@ int main() {
     SetConsoleMode(hOut, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 #endif
 
-    // Intentar cargar datos al inicio si existen los archivos
+    // si hay archivos, cargarlos
     cargarTodo();
 
     pantallaPrincipal();
